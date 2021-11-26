@@ -5,7 +5,7 @@ const moduleService = require('../services/moduleService');
 /* GET user. */
 router.get('/view_modules', async function(req, res, next) {
   try {
-    res.json(await moduleService.getUsers());
+    res.json(await moduleService.getModules(req.body));
   } catch (err) {
     console.error(`Error while getting module details `, err.message);
     next(err);

@@ -2,7 +2,7 @@ const db = require('./db');
 
 // GET all users //
 async function getModules(userData){
-    const data = null;
+    let data = null;
     if(userData.type==1 || userData.type==2){
         const rows = await db.query(
             `SELECT name 
@@ -14,9 +14,9 @@ async function getModules(userData){
         const rows = await db.query(
             `SELECT module.name 
             FROM module, class_module, student
-            WHERE module.id=class_module.moduleid AND class_module.classid=student.classid AND student.userid=(?)`,
+            WHERE module.id=class_module.moduleid AND class_module.classname=student.classname AND student.username=(?)`,
             [
-                userData.userid
+                userData.username
             ]
           );
         data = rows;
@@ -31,29 +31,28 @@ async function getModules(userData){
 }
 
 
-// CREATE instructor //
-async function createInstructor(instructor){
-  const result = await db.query(
-    `INSERT INTO user 
-    (username, password) 
-    VALUES 
-    (?, ?)`, 
-    [
-      instructor.name, instructor.password
-    ]
-  );
+// // CREATE instructor //
+// async function createInstructor(instructor){
+//   const result = await db.query(
+//     `INSERT INTO user 
+//     (username, password) 
+//     VALUES 
+//     (?, ?)`, 
+//     [
+//       instructor.name, instructor.password
+//     ]
+//   );
 
-  let message = 'Error in creating instructor';
+//   let message = 'Error in creating instructor';
 
-  if (result.affectedRows) {
-    message = 'Instructor created successfully';
-  }
+//   if (result.affectedRows) {
+//     message = 'Instructor created successfully';
+//   }
 
-  return {message};
-}
+//   return {message};
+// }
 
 
 module.exports = {
-  getModules,
-  createInstructor
+  getModules
 }

@@ -1,4 +1,6 @@
 const db = require('./db');
+const randomPasswordGenerator = require('secure-random-password');
+
 
 // GET all users //
 async function getUsers(){
@@ -16,13 +18,14 @@ async function getUsers(){
 
 // CREATE instructor //
 async function createInstructor(instructor){
+  const password=randomPasswordGenerator.randomPassword();
   const result = await db.query(
     `INSERT INTO user 
     (username, password, type) 
     VALUES 
     (?, ?, 2)`, 
     [
-      instructor.name, instructor.password
+      instructor.name, password
     ]
   );
 
@@ -32,24 +35,36 @@ async function createInstructor(instructor){
     message = 'Instructor created successfully';
   }
 
-  return {message};
+  return {message,password};
 }
 
-// CREATE instructor //
+// CREATE student //
 async function createStudent(student){
-  const result = await db.query(
+  console.log(student);
+  console.log("here1");
+  const resultUser = await db.query(
     `INSERT INTO user 
     (username, password, type) 
     VALUES 
     (?, ?, 3)`, 
     [
-      student.name, student.password
+      student.username, student.password
+    ]
+  );
+  console.log("here2");
+  const resultStudent = await db.query(
+    `INSERT INTO student 
+    (classname, username) 
+    VALUES 
+    (?, ?)`, 
+    [
+      student.classname, student.username
     ]
   );
 
   let message = 'Error in creating student';
 
-  if (result.affectedRows) {
+  if (resultUser.affectedRows && resultStudent.affectedRows) {
     message = 'Student created successfully';
   }
 
