@@ -1,9 +1,19 @@
 const express = require('express');
 const router = express.Router();
 const moduleService = require('../services/module.service');
+const authMiddleware = require('../middleware/auth.middleware')
 
-/* GET user. */
-router.get('/view_modules', async function(req, res, next) {
+
+/**
+ * @swagger
+ * /module/view_modules:
+ *    get:
+ *      description: veiw all accessible modules based on the user type
+ *      responses:
+ *       data:
+ *         description: list of modules
+ */
+ router.get('/view_modules', async function(req, res, next) {
   try {
     res.json(await moduleService.getModules(req.body));
   } catch (err) {
@@ -13,7 +23,15 @@ router.get('/view_modules', async function(req, res, next) {
 });
 
 
-/* GET user. */
+/**
+ * @swagger
+ * /module/execute_module/IMAGE_PROCESSING:
+ *    get:
+ *      description: execute module-IMAGE_PROCESSING
+ *      responses:
+ *       data:
+ *         description: Whether the said module could be executed or not
+ */
 router.get('/execute_module/IMAGE_PROCESSING', async function(req, res, next) {
   try {
     res.json(await moduleService.executeModules(req.body,'IMAGE_PROCESSING'));
@@ -23,6 +41,15 @@ router.get('/execute_module/IMAGE_PROCESSING', async function(req, res, next) {
   }
 });
 
+/**
+ * @swagger
+ * /module/execute_module/VOICE_REC:
+ *    get:
+ *      description: execute module-VOICE_REC
+ *      responses:
+ *       data:
+ *         description: Whether the said module could be executed or not
+ */
 router.get('/execute_module/VOICE_REC', async function(req, res, next) {
   try {
     res.json(await moduleService.executeModules(req.body,'VOICE_REC'));
@@ -32,6 +59,15 @@ router.get('/execute_module/VOICE_REC', async function(req, res, next) {
   }
 });
 
+/**
+ * @swagger
+ * /module/execute_module/FACE_DETECT:
+ *    get:
+ *      description: execute module-FACE_DETECT
+ *      responses:
+ *       data:
+ *         description: Whether the said module could be executed or not
+ */
 router.get('/execute_module/FACE_DETECT', async function(req, res, next) {
   try {
     res.json(await moduleService.executeModules(req.body,'FACE_DETECT'));

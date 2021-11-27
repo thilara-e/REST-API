@@ -1,20 +1,24 @@
 const express = require('express');
 const router = express.Router();
 const userService = require('../services/user.service');
+const authMiddleware = require('../middleware/auth.middleware')
 
 
 /**
  * @swagger
- * /user/:
- *    get:
- *      description: Use to return all customers
- *    responses:
- *      '201':
- *        description: Successfully created user
+ * /user/instructor_create:
+ *    post:
+ *      description: create new instructor user
+ *      parameters:
+ *        username:
+ *          type: String
+ *          description: name of the instructor
+ *      responses:
+ *       password:
+ *         description: randomly generated password for the newly created instructor
  */
 
-/* POST user */
-router.post('/instructor_create', async function(req, res, next) {
+router.post('/instructor_create',authMiddleware, async function(req, res, next) {
   try {
     res.json(await userService.createInstructor(req.body));
   } catch (err) {
