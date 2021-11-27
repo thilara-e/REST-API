@@ -7,7 +7,25 @@ const classRouter = require('./routes/class.route');
 const moduleRouter = require('./routes/module.route');
 const authRouter = require('./routes/auth.route');
 const swaggerUi = require('swagger-ui-express');
-const swaggerDocument = require('./docs/basicInfo');
+const swaggerJSDocs = require('swagger-jsdoc');
+
+const swaggerOptions = {
+  swaggerDefinition:{
+    info: {
+      title: "REST API", 
+      description: "Role based REST API development", 
+      version: "1.0.0", 
+      servers: ["http://localhost:3000"]
+    }
+    
+  },
+  apis:["index.js"]
+
+};
+
+const swaggerDocs = swaggerJSDocs(swaggerOptions);
+//Swagger documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 
 app.use(bodyParser.json());
@@ -21,15 +39,13 @@ app.get('/health', (req, res) => {
   res.json({'message': 'ok'});
 })
 
+
 app.use('/user', userRouter);
 app.use('/class', classRouter);
 app.use('/module', moduleRouter);
 app.use('/auth', authRouter);
 
 
-//Swagger documentation
-app.use('/api-docs', swaggerUi.serve);
-app.get('/api-docs', swaggerUi.setup(swaggerDocument));
 
 /* Error handler middleware */
 app.use((err, req, res, next) => {

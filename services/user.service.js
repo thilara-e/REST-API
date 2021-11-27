@@ -1,38 +1,40 @@
 const db = require('./db');
 const randomPasswordGenerator = require('secure-random-password');
+const Joi = require('joi');
+const bcrypt = require('bcryptjs');
 
-
-// GET all users //
-async function getUsers(){
-  const rows = await db.query(
-    `SELECT * 
-    FROM user`
-  );
-  const data = rows;
-
-  return {
-    data
-  }
-}
 
 
 // CREATE instructor //
 async function createInstructor(instructor){
+
+  const schema = Joi.object({
+    username: Joi.string()
+        .required(),
+
+  });
+  const valid=await schema.validate(instructor);
+  if(valid.error){
+    throw new Error('Validation Error');
+
+  }
+  
   const password=randomPasswordGenerator.randomPassword();
+  const bcryptPassword=await bcrypt.hash(password, 8);
+
   const result = await db.query(
     `INSERT INTO user 
     (username, password, type) 
     VALUES 
     (?, ?, 2)`, 
     [
-      instructor.name, password
+      instructor.username, bcryptPassword
     ]
   );
 
   let message = 'Error in creating instructor';
-
-  if (result.affectedRows) {
-    message = 'Instructor created successfully';
+  if (!result.affectedRows) {
+    throw new Error('No Data Found');
   }
 
   return {message,password};
@@ -40,6 +42,21 @@ async function createInstructor(instructor){
 
 // CREATE student //
 async function createStudent(student){
+
+  const schema = Joi.object({
+    username: Joi.string()
+        .required(),
+    password: Joi.string()
+        .required(),
+    classname: Joi.string()
+        .required(),
+
+  });
+  const valid=await schema.validate(instructor);
+  if(valid.error){
+    throw new Error('Bad Request');
+  }
+
   const resultUser = await db.query(
     `INSERT INTO user 
     (username, password, type) 
@@ -62,8 +79,8 @@ async function createStudent(student){
 
   let message = 'Error in creating student';
 
-  if (resultUser.affectedRows && resultStudent.affectedRows) {
-    message = 'Student created successfully';
+  if (!(resultUser.affectedRows && resultStudent.affectedRows)) {
+    throw new Error('No Data Found');
   }
 
   return {message};
@@ -71,7 +88,6 @@ async function createStudent(student){
 
 
 module.exports = {
-  getUsers,
   createInstructor,
   createStudent
 }

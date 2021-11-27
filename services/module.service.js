@@ -1,29 +1,43 @@
+const Joi = require('joi');
 const db = require('./db');
 
 // GET all users //
-async function getModules(userData){
-    let data = null;
-    if(userData.type==1 || userData.type==2){
-        const rows = await db.query(
-            `SELECT name 
-            FROM module`
-          );
-        data = rows;
-    }
-    else{
-        const rows = await db.query(
-            `SELECT module.name 
-            FROM module, class_module, student
-            WHERE module.id=class_module.moduleid AND class_module.classname=student.classname AND student.username=(?)`,
-            [
-                userData.username
-            ]
-          );
-        data = rows;
+async function getModules(userData) {
 
-    }
-  
-  
+  const schema = Joi.object({
+    username: Joi.string()
+      .required(),
+    type: Joi.number()
+      .integer()
+      .required()
+  });
+  const valid = await schema.validate(userData);
+  if (valid.error) {
+    throw new Error('Validation Error');
+  }
+
+  let data = null;
+  if (userData.type == 1 || userData.type == 2) {
+    const rows = await db.query(
+      `SELECT modulename 
+            FROM class_module`
+    );
+    data = rows;
+  }
+  else {
+    const rows = await db.query(
+      `SELECT modulename 
+            FROM class_module, student
+            WHERE class_module.classname=student.classname AND student.username=(?)`,
+      [
+        userData.username
+      ]
+    );
+    data = rows;
+
+  }
+
+
 
   return {
     data
@@ -31,28 +45,48 @@ async function getModules(userData){
 }
 
 
-// // CREATE instructor //
-// async function createInstructor(instructor){
-//   const result = await db.query(
-//     `INSERT INTO user 
-//     (username, password) 
-//     VALUES 
-//     (?, ?)`, 
-//     [
-//       instructor.name, instructor.password
-//     ]
-//   );
+async function executeModules(userData, modulename) {
 
-//   let message = 'Error in creating instructor';
+  const schema = Joi.object({
+    username: Joi.string()
+      .required(),
+    type: Joi.number()
+      .integer()
+      .required()
+  });
+  const valid = await schema.validate(userData);
+  if (valid.error) {
+    throw new Error('Validation Error');
+  }
 
-//   if (result.affectedRows) {
-//     message = 'Instructor created successfully';
-//   }
+  let message = null;
+  if (userData.type == 1 || userData.type == 2) {
+    message = "Hello Module" + modulename;
+    return (message);
+  }
+  else {
+    const rows = await db.query(
+      `SELECT modulename 
+      FROM class_module, student
+      WHERE class_module.classname=student.classname AND student.username=(?)`,
+      [
+        userData.username
+      ]
+    );
+    for (let i = 0; i < rows.length; i++) {
+      if (rows[i].modulename == modulename) {
+        message = "Hello Module" + modulename;
+        return (message);
+      }
+    }
+    throw new Error('401 Error');
 
-//   return {message};
-// }
 
-
-module.exports = {
-  getModules
+  }
 }
+
+
+  module.exports = {
+    getModules,
+    executeModules
+  }

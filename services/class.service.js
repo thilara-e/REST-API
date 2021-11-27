@@ -5,6 +5,19 @@ const randomPasswordGenerator = require('secure-random-password');
 
 // CREATE class //
 async function createClass(classData){
+  const schema = Joi.object({
+    classname: Joi.string()
+        .required(),
+    modules: Joi.array().items(Joi.number())
+        .required(),
+    students:  Joi.array().items(Joi.string())
+        .required(),
+
+  });
+  const valid=await schema.validate(classData);
+  if(valid.error){
+    throw new Error('Validation Error');
+  }
   const password=randomPasswordGenerator.randomPassword();
   // create class in class table
   const resultClass = await db.query(
@@ -13,14 +26,14 @@ async function createClass(classData){
     VALUES 
     (?)`, 
     [
-        classData.name
+        classData.classname
     ]
   );
 
   // create students and assign into class
   const students= classData.students;
   for (let i = 0; i < students.length; i++) {
-      const studentData={"classname":classData.name, "username":students[i], "password":password};
+      const studentData={"classname":classData.classname, "username":students[i], "password":password};
       await user.createStudent(studentData);
   }
 
@@ -33,7 +46,7 @@ async function createClass(classData){
         VALUES 
         (?,?)`, 
         [
-            classData.name, modules[i]
+            classData.classname, modules[i]
         ]
       );
   } 
@@ -42,8 +55,8 @@ async function createClass(classData){
 
   let message = 'Error in creating class';
 
-  if (resultClass.affectedRows && resultModule.affectedRows) {
-    message = 'Class created successfully';
+  if (!(resultClass.affectedRows && resultModule.affectedRows)) {
+    throw new Error('No Data Found');
   }
 
   return {message,password};
