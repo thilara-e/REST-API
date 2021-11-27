@@ -31,7 +31,7 @@ async function generateToken(user) {
     let token;
     if (checkPassword) {
         token = jwt.sign(
-            { username: user.username, type: userRow.type },
+            { username: user.username, type: userRow[0].type },
             config.TOKEN_KEY,
             {
                 expiresIn: "2h",
@@ -41,7 +41,9 @@ async function generateToken(user) {
         user.token = token;
     }
     else {
-        throw new Error('Error generating the token');
+        const error = new Error("Invalid Login");
+        error.statusCode = 401;
+        throw error;
     }
 
 

@@ -1,40 +1,35 @@
-const Joi = require('joi');
 const db = require('./db');
 
 // GET all modules based on user type //
-async function getModules(userData) {
-
-  const schema = Joi.object({
-    username: Joi.string()
-      .required(),
-    type: Joi.number()
-      .integer()
-      .required()
-  });
-  const valid = await schema.validate(userData);
-  if (valid.error) {
-    return res.status(400).send("Bad Request");
-  }
-
+async function getModules(jwtToken) {
+  const type = jwtToken.type;
+  const username = jwtToken.username;
   let data = null;
-  if (userData.type == 1 || userData.type == 2) {
-    const rows = await db.query(
-      `SELECT modulename 
+  try {
+    if (type == 1 || type == 2) {
+      const rows = await db.query(
+        `SELECT distinct modulename 
             FROM class_module`
-    );
-    data = rows;
-  }
-  else {
-    const rows = await db.query(
-      `SELECT modulename 
+      );
+      data = rows;
+    }
+    else {
+      const rows = await db.query(
+        `SELECT distinct modulename 
             FROM class_module, student
             WHERE class_module.classname=student.classname AND student.username=(?)`,
-      [
-        userData.username
-      ]
-    );
-    data = rows;
+        [
+          username
+        ]
+      );
+      data = rows;
 
+    }
+  }
+  catch (err) {
+    const error = new Error(err.sqlMessage);
+    error.statusCode = 400;
+    throw error;
   }
 
 
@@ -45,48 +40,49 @@ async function getModules(userData) {
 }
 
 // execute modules based on user type and module accessibility//
-async function executeModules(userData, modulename) {
-
-  const schema = Joi.object({
-    username: Joi.string()
-      .required(),
-    type: Joi.number()
-      .integer()
-      .required()
-  });
-  const valid = await schema.validate(userData);
-  if (valid.error) {
-    return res.status(400).send("Bad Request");
-  }
-
+async function executeModules(jwtToken, modulename) {
+  const type = jwtToken.type;
+  const username = jwtToken.username;
   let message = null;
-  if (userData.type == 1 || userData.type == 2) {
+  if (type == 1 || type == 2) {
     message = "Hello Module" + modulename;
     return (message);
   }
   else {
-    const rows = await db.query(
-      `SELECT modulename 
+    let rows;
+    try {
+      rows = await db.query(
+        `SELECT distinct modulename 
       FROM class_module, student
       WHERE class_module.classname=student.classname AND student.username=(?)`,
-      [
-        userData.username
-      ]
-    );
+        [
+          username
+        ]
+      );
+    }
+    catch (err) {
+      const error = new Error(err.sqlMessage);
+      error.statusCode = 400;
+      throw error;
+    }
     for (let i = 0; i < rows.length; i++) {
       if (rows[i].modulename == modulename) {
         message = "Hello Module " + modulename;
         return (message);
       }
     }
-    return res.status(401).send("Unauthorized");
+    const error = new Error("Unauthorized");
+    error.statusCode = 401;
+    throw error;
+
+
 
 
   }
 }
 
 
-  module.exports = {
-    getModules,
-    executeModules
-  }
+module.exports = {
+  getModules,
+  executeModules
+}
