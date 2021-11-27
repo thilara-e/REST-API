@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const classService = require('../services/classService');
+const classService = require('../services/class.service');
 
 /* POST class */
 router.post('/class_create', async function(req, res, next) {

@@ -1,5 +1,5 @@
 const db = require('./db');
-const user = require('./userService');
+const user = require('./user.service');
 const randomPasswordGenerator = require('secure-random-password');
 
 

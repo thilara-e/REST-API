@@ -40,8 +40,6 @@ async function createInstructor(instructor){
 
 // CREATE student //
 async function createStudent(student){
-  console.log(student);
-  console.log("here1");
   const resultUser = await db.query(
     `INSERT INTO user 
     (username, password, type) 
@@ -51,7 +49,7 @@ async function createStudent(student){
       student.username, student.password
     ]
   );
-  console.log("here2");
+
   const resultStudent = await db.query(
     `INSERT INTO student 
     (classname, username) 

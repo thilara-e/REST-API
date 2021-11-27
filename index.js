@@ -2,9 +2,10 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
 const port = process.env.PORT || 3000;
-const userRouter = require('./routes/user');
-const classRouter = require('./routes/class');
-const moduleRouter = require('./routes/module');
+const userRouter = require('./routes/user.route');
+const classRouter = require('./routes/class.route');
+const moduleRouter = require('./routes/module.route');
+const authRouter = require('./routes/auth.route');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./docs/basicInfo');
 
@@ -16,13 +17,15 @@ app.use(
   })
 );
 
-app.get('/', (req, res) => {
+app.get('/health', (req, res) => {
   res.json({'message': 'ok'});
 })
 
 app.use('/user', userRouter);
 app.use('/class', classRouter);
 app.use('/module', moduleRouter);
+app.use('/auth', authRouter);
+
 
 //Swagger documentation
 app.use('/api-docs', swaggerUi.serve);
