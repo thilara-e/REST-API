@@ -12,14 +12,14 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerJSDocs = require('swagger-jsdoc');
 
 const swaggerOptions = {
-  swaggerDefinition:{
+  swaggerDefinition: {
     info: {
-      title: "REST API", 
-      description: "Role based REST API development", 
-      version: "1.0.0", 
+      title: "REST API",
+      description: "Role based REST API development",
+      version: "1.0.0",
       servers: ["http://localhost:3000"]
     }
-    
+
   },
   apis: ["./routes/*.js"],
 
@@ -38,7 +38,7 @@ app.use(
 );
 
 app.get('/health', (req, res) => {
-  res.json({'message': 'ok'});
+  res.json({ 'message': 'ok' });
 })
 
 
@@ -52,9 +52,8 @@ app.use('/auth', authRouter);
 /* Error handler middleware */
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
-  console.error(err.message, err.stack);
-  res.status(statusCode).json({'message': err.message});
-
+  // console.error(err.message, err.stack);
+  res.status(statusCode).json({ 'message': err.message });
 
   return;
 });
