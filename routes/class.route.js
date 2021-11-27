@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const classService = require('../services/class.service');
 const authMiddleware = require('../middleware/auth.middleware')
+const secureAuthMiddleware = require('../middleware/auth.role');
 
 
 /**
@@ -23,12 +24,11 @@ const authMiddleware = require('../middleware/auth.middleware')
  *          password:
  *            description: randomly generated common password for all the students taking the class
  */
- router.post('/class_create', async function(req, res, next) {
-   
+router.post('/class_create', [authMiddleware, secureAuthMiddleware([2])], async function (req, res, next) {
+
   try {
     res.json(await classService.createClass(req.body));
   } catch (err) {
-    console.error(`Error while creating class`, err.message);
     next(err);
   }
 });

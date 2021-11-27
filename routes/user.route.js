@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const userService = require('../services/user.service');
-const authMiddleware = require('../middleware/auth.middleware')
+const authMiddleware = require('../middleware/auth.middleware');
+const secureAuthMiddleware = require('../middleware/auth.role');
 
 
 /**
@@ -18,11 +19,11 @@ const authMiddleware = require('../middleware/auth.middleware')
  *         description: randomly generated password for the newly created instructor
  */
 
-router.post('/instructor_create',authMiddleware, async function(req, res, next) {
+router.post('/instructor_create', [authMiddleware, secureAuthMiddleware([1])], async function (req, res, next) {
+  console.log(req.user);
   try {
     res.json(await userService.createInstructor(req.body));
   } catch (err) {
-    console.error(`Error while creating instructor`, err.message);
     next(err);
   }
 });
