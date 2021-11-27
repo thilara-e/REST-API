@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
+const config = require('../config');
 
-const config = process.env;
 
 const verifyToken = (req, res, next) => {
   let token =
@@ -18,6 +18,7 @@ const verifyToken = (req, res, next) => {
 
 
   try {
+    console.log( config.TOKEN_KEY);
     const decoded = jwt.verify(token, config.TOKEN_KEY);
     req.user = decoded;
   } catch (err) {

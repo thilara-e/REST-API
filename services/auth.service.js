@@ -1,6 +1,9 @@
 const db = require('./db');
 const bcrypt = require('bcryptjs');
 const jwt = require("jsonwebtoken");
+const Joi = require('joi');
+const config = require('../config');
+
 
 
 // Generate token //
@@ -11,9 +14,9 @@ async function generateToken(user) {
         password: Joi.string()
             .required()
     });
-    const valid = await schema.validate(userData);
+    const valid = await schema.validate(user);
     if (valid.error) {
-        throw new Error('Validation Error');
+        return res.status(400).send("Bad Request");
     }
 
     const userRow = await db.query(
@@ -29,7 +32,7 @@ async function generateToken(user) {
     if (checkPassword) {
         token = jwt.sign(
             { username: user.username, type: userRow.type },
-            process.env.TOKEN_KEY || "secret",
+            config.TOKEN_KEY,
             {
                 expiresIn: "2h",
             },

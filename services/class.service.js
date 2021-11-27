@@ -1,6 +1,10 @@
 const db = require('./db');
 const user = require('./user.service');
 const randomPasswordGenerator = require('secure-random-password');
+const Joi = require('joi');
+const bcrypt = require('bcryptjs');
+
+
 
 
 // CREATE class //
@@ -16,9 +20,11 @@ async function createClass(classData){
   });
   const valid=await schema.validate(classData);
   if(valid.error){
-    throw new Error('Validation Error');
+    return res.status(400).send("Bad Request");
   }
   const password=randomPasswordGenerator.randomPassword();
+  const bcryptPassword=await bcrypt.hash(password, 8);
+
   // create class in class table
   const resultClass = await db.query(
     `INSERT INTO class 

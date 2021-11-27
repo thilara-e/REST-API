@@ -1,7 +1,7 @@
 const Joi = require('joi');
 const db = require('./db');
 
-// GET all users //
+// GET all modules based on user type //
 async function getModules(userData) {
 
   const schema = Joi.object({
@@ -13,7 +13,7 @@ async function getModules(userData) {
   });
   const valid = await schema.validate(userData);
   if (valid.error) {
-    throw new Error('Validation Error');
+    return res.status(400).send("Bad Request");
   }
 
   let data = null;
@@ -44,7 +44,7 @@ async function getModules(userData) {
   }
 }
 
-
+// execute modules based on user type and module accessibility//
 async function executeModules(userData, modulename) {
 
   const schema = Joi.object({
@@ -56,7 +56,7 @@ async function executeModules(userData, modulename) {
   });
   const valid = await schema.validate(userData);
   if (valid.error) {
-    throw new Error('Validation Error');
+    return res.status(400).send("Bad Request");
   }
 
   let message = null;
@@ -75,11 +75,11 @@ async function executeModules(userData, modulename) {
     );
     for (let i = 0; i < rows.length; i++) {
       if (rows[i].modulename == modulename) {
-        message = "Hello Module" + modulename;
+        message = "Hello Module " + modulename;
         return (message);
       }
     }
-    throw new Error('401 Error');
+    return res.status(401).send("Unauthorized");
 
 
   }

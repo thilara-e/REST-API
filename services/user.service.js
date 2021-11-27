@@ -15,14 +15,14 @@ async function createInstructor(instructor){
   });
   const valid=await schema.validate(instructor);
   if(valid.error){
-    throw new Error('Validation Error');
+    return res.status(400).send("Bad Request");
 
   }
   
   const password=randomPasswordGenerator.randomPassword();
   const bcryptPassword=await bcrypt.hash(password, 8);
 
-  const result = await db.query(
+  try{let result = await db.query(
     `INSERT INTO user 
     (username, password, type) 
     VALUES 
@@ -31,13 +31,16 @@ async function createInstructor(instructor){
       instructor.username, bcryptPassword
     ]
   );
+  }
+  catch(err){
+    return res.status(400).send(err.sqlMessage);
+  }
 
-  let message = 'Error in creating instructor';
   if (!result.affectedRows) {
     throw new Error('No Data Found');
   }
 
-  return {message,password};
+  return {password};
 }
 
 // CREATE student //
@@ -54,7 +57,7 @@ async function createStudent(student){
   });
   const valid=await schema.validate(instructor);
   if(valid.error){
-    throw new Error('Bad Request');
+    return res.status(400).send("Bad Request");
   }
 
   const resultUser = await db.query(
@@ -80,7 +83,7 @@ async function createStudent(student){
   let message = 'Error in creating student';
 
   if (!(resultUser.affectedRows && resultStudent.affectedRows)) {
-    throw new Error('No Data Found');
+    return res.status(404).send("Not Found");
   }
 
   return {message};
