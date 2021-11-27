@@ -21,8 +21,8 @@ const secureAuthMiddleware = require('../middleware/auth.role');
  *          type: list of Strings
  *          description: list of student names that are taking the class
  *      responses:
- *          password:
- *            description: randomly generated common password for all the students taking the class
+ *          '201':
+ *            description: A successful class creation
  */
 router.post('/class_create', [authMiddleware, secureAuthMiddleware([2])], async function (req, res, next) {
 

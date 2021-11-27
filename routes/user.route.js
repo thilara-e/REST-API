@@ -15,12 +15,11 @@ const secureAuthMiddleware = require('../middleware/auth.role');
  *          type: String
  *          description: name of the instructor
  *      responses:
- *       password:
- *         description: randomly generated password for the newly created instructor
+ *       '201':
+ *            description: A successful instructor creation
  */
 
 router.post('/instructor_create', [authMiddleware, secureAuthMiddleware([1])], async function (req, res, next) {
-  console.log(req.user);
   try {
     res.json(await userService.createInstructor(req.body));
   } catch (err) {

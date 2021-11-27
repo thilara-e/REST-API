@@ -15,16 +15,16 @@ const authService = require('../services/auth.service');
  *          type: String
  *          description: password given by the admin at creation
  *      responses:
- *       token:
- *         description: JWT token of the validated user
+ *         '200':
+ *            description: A successful login
+ *         
  */
 
 
-router.post('/login', async function(req, res, next) {
+router.post('/login', async function (req, res, next) {
   try {
     res.json(await authService.generateToken(req.body));
   } catch (err) {
-    console.error(`invalid login`, err.message);
     next(err);
   }
 });
