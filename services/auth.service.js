@@ -8,6 +8,7 @@ const config = require('../config');
 
 // Generate token //
 async function generateToken(user) {
+    //validatio=ng the endpoint request
     const schema = Joi.object({
         username: Joi.string()
             .required(),
@@ -18,7 +19,7 @@ async function generateToken(user) {
     if (valid.error) {
         return res.status(400).send("Bad Request");
     }
-
+    // validating the login incredentials
     const userRow = await db.query(
         `SELECT * 
     FROM user
@@ -30,6 +31,7 @@ async function generateToken(user) {
     const checkPassword = await bcrypt.compare(user.password, userRow[0].password);
     let token;
     if (checkPassword) {
+        //generating the jwt token
         token = jwt.sign(
             { username: user.username, type: userRow[0].type },
             config.TOKEN_KEY,

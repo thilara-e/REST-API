@@ -9,6 +9,7 @@ const bcrypt = require('bcryptjs');
 
 // CREATE class //
 async function createClass(classData) {
+  //Check for validation errors on the request
   const schema = Joi.object({
     classname: Joi.string()
       .required(),
@@ -24,6 +25,23 @@ async function createClass(classData) {
     error.statusCode = 400;
     throw error;
   }
+  //Check for duplicate student entries
+  const exisitingUsers = await db.query(
+    `SELECT username
+    FROM user`
+  );
+  const students = classData.students;
+  for (let i = 0; i < students.length; i++) {
+    for (let j = 0; j < exisitingUsers.length; j++) {
+      if (exisitingUsers[j].username == students[i]) {
+        const error = new Error("Duplicate entry for student");
+        error.statusCode = 400;
+        throw error;
+      }
+    }
+  }
+
+  //passowrd generation
   const password = randomPasswordGenerator.randomPassword();
   const bcryptPassword = await bcrypt.hash(password, 8);
 
@@ -40,7 +58,6 @@ async function createClass(classData) {
     );
 
     // create students and assign into class
-    const students = classData.students;
     for (let i = 0; i < students.length; i++) {
       const studentData = { "classname": classData.classname, "username": students[i], "password": bcryptPassword };
       await user.createStudent(studentData);
@@ -68,9 +85,9 @@ async function createClass(classData) {
 
 
 
-  
 
-  return {password};
+
+  return { password };
 }
 
 

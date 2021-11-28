@@ -7,7 +7,7 @@ const bcrypt = require('bcryptjs');
 
 // CREATE instructor //
 async function createInstructor(instructor) {
-
+  //Validating the endpoint requests
   const schema = Joi.object({
     username: Joi.string()
       .required(),
@@ -19,7 +19,7 @@ async function createInstructor(instructor) {
     error.statusCode = 400;
     throw error;
   }
-
+  //random password generation
   const password = randomPasswordGenerator.randomPassword();
   const bcryptPassword = await bcrypt.hash(password, 8);
 
@@ -46,6 +46,7 @@ async function createInstructor(instructor) {
 
 // CREATE student //
 async function createStudent(student) {
+  //validating the endpoint requests
   const schema = Joi.object({
     username: Joi.string()
       .required(),
@@ -63,6 +64,7 @@ async function createStudent(student) {
   }
 
   try {
+    //insert student into user table
     const resultUser = await db.query(
       `INSERT INTO user 
     (username, password, type) 
@@ -72,7 +74,7 @@ async function createStudent(student) {
         student.username, student.password
       ]
     );
-
+    // assign student to class
     const resultStudent = await db.query(
       `INSERT INTO student 
     (classname, username) 

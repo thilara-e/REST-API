@@ -6,6 +6,7 @@ async function getModules(jwtToken) {
   const username = jwtToken.username;
   let data = null;
   try {
+    //If user type is 1=(Admin) or 2=(instructor) -> veiw all modules
     if (type == 1 || type == 2) {
       const rows = await db.query(
         `SELECT distinct modulename 
@@ -14,6 +15,7 @@ async function getModules(jwtToken) {
       data = rows;
     }
     else {
+      //IF user type is student -> view only relevant modules
       const rows = await db.query(
         `SELECT distinct modulename 
             FROM class_module, student
